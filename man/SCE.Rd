@@ -1,49 +1,55 @@
 \name{SCE}
 \alias{SCE}
+\alias{SCA}
 
 \title{
-	Build a Stepwise Clustered Ensemble (SCE) Model
+	Stepwise Clustered Ensemble (SCE) and Stepwise Cluster Analysis (SCA) Models
 }
 
 \description{
-	This function builds a Stepwise Clustered Ensemble (SCE) model for multivariate data analysis.
-	The SCE model is an ensemble of Stepwise Cluster Analysis (SCA) trees, where each tree is built 
-	using bootstrap samples and random feature selection. The function includes comprehensive input 
-	validation for data types, missing values, and sample size requirements.
+	This package provides two main modeling approaches:
+	
+	\strong{SCA (Stepwise Cluster Analysis):} A single tree model that recursively partitions the data space based on Wilks' Lambda statistic, creating a tree structure for prediction.
+	
+	\strong{SCE (Stepwise Clustered Ensemble):} An ensemble of SCA trees built using bootstrap samples and random feature selection, providing improved prediction accuracy and robustness.
+	
+	Both functions include comprehensive input validation for data types, missing values, and sample size requirements, and support both single and multiple predictants.
 }
 
 \usage{
-SCE(Training_data, X, Y, mfeature, Nmin, Ntree, 
-    alpha = 0.05, resolution = 1000, verbose = FALSE, parallel = TRUE)
+SCA(Training_data, X, Y, Nmin, alpha = 0.05, resolution = 1000, verbose = FALSE)
+
+SCE(Training_data, X, Y, mfeature, Nmin, Ntree,
+	alpha = 0.05, resolution = 1000, verbose = FALSE, parallel = TRUE)
 }
 
 \arguments{
 	\item{Training_data}{
 		A data.frame or matrix containing the training data.
-		Must contain all specified predictors and predictants.
+		Must include all specified predictors and predictants.
 		Must not contain missing values.
 	}
 	\item{X}{
-		A character vector specifying the names of independent (predictor) variables
+		A character vector specifying the names of independent variables
 		(e.g., c("Prcp","SRad","Tmax")). Must be present in Training_data.
 		All variables must be numeric.
 	}
 	\item{Y}{
-		A character vector specifying the name(s) of dependent (predictant) variable(s)
-		(e.g., c("Flow") or c("swvl3","swvl4")). Must be present in Training_data.
+		A character vector specifying the name(s) of dependent variable(s)
+		(e.g., c("swvl3","swvl4")). Must be present in Training_data.
 		All variables must be numeric.
+	}
+	\item{Nmin}{
+		Integer specifying the minimal number of samples in a leaf node for cutting.
+		Must be a positive number and less than the sample size.
 	}
 	\item{mfeature}{
 		An integer specifying how many features will be randomly selected for each tree.
-		Recommended value is round(0.5 * length(X)).
-	}
-	\item{Nmin}{
-		An integer specifying the minimal number of samples in a leaf node for cutting.
-		Must be greater than the number of predictants.
+		Recommended value is round(0.5 * length(X)). Only used for SCE.
 	}
 	\item{Ntree}{
 		An integer specifying how many trees (ensemble members) will be built.
-		Recommended values range from 50 to 500 depending on data complexity.
+		Recommended values range from 50 to 500 depending on data complexity. Only used for SCE.
 	}
 	\item{alpha}{
 		Numeric significance level for clustering, between 0 and 1.
@@ -61,14 +67,28 @@ SCE(Training_data, X, Y, mfeature, Nmin, Ntree,
 	\item{parallel}{
 		A logical value indicating whether to use parallel processing for tree construction.
 		When TRUE, uses multiple CPU cores for faster computation. When FALSE, processes trees sequentially.
-		Default value is TRUE.
+		Default value is TRUE. Only used for SCE.
 	}
 }
 
 \value{
-	A list containing the ensemble model with the following components:
+	\strong{For SCA:} An S3 object of class "SCA" containing:
 	\itemize{
-		\item \code{Trees}: A list of SCA tree models, each containing:
+		\item Tree: The SCA tree structure
+		\item Map: Mapping information for predictions
+		\item XName: Names of predictors used
+		\item YName: Names of predictants
+		\item type: Mapping type (currently "mean")
+		\item totalNodes: Total number of nodes in the tree
+		\item leafNodes: Number of leaf nodes
+		\item cuttingActions: Number of cutting actions performed
+		\item mergingActions: Number of merging actions performed
+		\item call: Function call
+	}
+	
+	\strong{For SCE:} An S3 object of class "SCE" containing the ensemble model with the following components:
+	\itemize{
+		\item \code{trees}: A list of SCA tree models, each containing:
 			\itemize{
 				\item \code{Tree}: The SCA tree structure
 				\item \code{Map}: Mapping information
@@ -86,44 +106,50 @@ SCE(Training_data, X, Y, mfeature, Nmin, Ntree,
 				\item \code{Training_data}: Training data used for the tree
 				\item \code{weight}: Tree weight based on OOB performance
 			}
+		\item \code{predictors}: Names of predictor variables
+		\item \code{predictants}: Names of predictant variables
+		\item \code{parameters}: Model parameters
+		\item \code{call}: Function call
 	}
+	
+	Both objects support S3 methods: \code{print()}, \code{summary()}, 
+	\code{predict()}, \code{importance()}, and \code{evaluate()}.
 }
 
 \details{
-	The SCE model is built using the following steps:
+	\strong{Model Building Process:}
+	
+	\emph{SCA (Single Tree):}
 	\enumerate{
-		\item \strong{Input Validation}:
-			\itemize{
-				\item Data type and structure checks
-				\item Missing value detection
-				\item Numeric data validation
-				\item Sample size requirements verification
-			}
-		\item \strong{Data Preparation}:
-			\itemize{
-				\item Conversion to appropriate format
-				\item Dimension checks
-				\item Parameter initialization
-			}
-		\item \strong{Tree Construction}:
-			\itemize{
-				\item Generation of bootstrap samples
-				\item Random feature selection for each tree
-				\item Parallel construction of SCA trees
-			}
-		\item \strong{Model Evaluation}:
-			\itemize{
-				\item Calculation of out-of-bag (OOB) errors
-				\item Weighting of trees based on OOB performance
-			}
+		\item Input validation (data types, missing values, sample size requirements)
+		\item Data preparation (conversion to matrix format, parameter initialization)
+		\item Tree construction (recursive partitioning based on Wilks' Lambda)
 	}
 	
-	The ensemble approach provides improved prediction accuracy and robustness compared to 
-	single SCA trees, while the OOB validation provides unbiased performance estimates.
+	\emph{SCE (Ensemble):}
+	\enumerate{
+		\item Input validation (data types, missing values, sample size requirements)
+		\item Data preparation (conversion to matrix format, parameter initialization)
+		\item Tree construction (bootstrap samples, random feature selection, parallel SCA tree building)
+		\item Model evaluation (OOB error calculation, tree weighting)
+	}
+	
+	\strong{Key Differences:}
+	\itemize{
+		\item \strong{SCA}: Single tree, deterministic, faster training, potentially less robust
+		\item \strong{SCE}: Multiple trees, ensemble approach, improved accuracy, OOB validation, parallel processing
+	}
+	
+	\strong{When to Use:}
+	\itemize{
+		\item \strong{SCA}: Quick exploration, simple relationships, limited computational resources
+		\item \strong{SCE}: Production models, complex relationships, when accuracy is critical
+	}
 }
 
 \author{
-	Kailong Li <lkl98509509@gmail.com>
+	Xiuquan Wang <xxwang@upei.ca> (original SCA)
+	Kailong Li <lkl98509509@gmail.com> (Resolution-search-based SCA and SCE ensemble)
 }
 
 \references{
@@ -143,29 +169,52 @@ SCE(Training_data, X, Y, mfeature, Nmin, Ntree,
 }
 
 \seealso{
-	\code{\link{SCA}} for single tree construction,
-	\code{\link{SCE_Prediction}} for making predictions,
-	\code{\link{Model_simulation}} for comprehensive model evaluation,
-	\code{\link{Wilks_importance}} for variable importance analysis,
+	\code{\link{predict}}, \code{\link{importance}}, \code{\link{evaluate}} for S3 methods,
 	\code{\link{RFE_SCE}} for recursive feature elimination
 }
 
 \examples{
 \donttest{
-	## Load required packages
+	## Load SCE package
 	library(SCE)
-	library(parallel)
 
-	## Load example datasets
+	## Load training and testing data
 	data("Streamflow_training_10var")
 	data("Streamflow_testing_10var")
 
-	## Define predictors and predictants
+	## Define independent (x) and dependent (y) variables
 	Predictors <- c("Prcp","SRad","Tmax","Tmin","VP","smlt","swvl1","swvl2","swvl3","swvl4")
 	Predictants <- c("Flow")
 
-	## Build the SCE model
-	Model <- SCE(
+	## Example 1: Build SCA model (single tree)
+	sca_model <- SCA(
+		Training_data = Streamflow_training_10var,
+		X = Predictors,
+		Y = Predictants,
+		Nmin = 5,
+		alpha = 0.05,
+		resolution = 1000
+	)
+	
+	## Use S3 methods for SCA model inspection
+	print(sca_model)
+	summary(sca_model)
+	
+	## Make predictions using S3 method
+	sca_predictions <- predict(sca_model, Streamflow_testing_10var)
+	
+	## Calculate variable importance using S3 method
+	sca_importance <- importance(sca_model)
+	
+	## Evaluate SCA model performance using S3 method
+	sca_evaluation <- evaluate(
+		object = sca_model,
+		Testing_data = Streamflow_testing_10var,
+		Predictant = Predictants
+	)
+
+	## Example 2: Build SCE model (ensemble)
+	sce_model <- SCE(
 		Training_data = Streamflow_training_10var,
 		X = Predictors,
 		Y = Predictants,
@@ -177,41 +226,27 @@ SCE(Training_data, X, Y, mfeature, Nmin, Ntree,
 		parallel = FALSE
 	)
 
-	## Generate predictions for test data
-	predictions <- SCE_Prediction(
-		X_sample = Streamflow_testing_10var,
-		model = Model
-	)
+	## Use S3 methods for SCE model inspection
+	print(sce_model)
+	summary(sce_model)
 
-	## Conduct comprehensive model evaluation
-	Results <- Model_simulation(
-		Testing_data = Streamflow_testing_10var,
-		model = Model
-	)
+	## Generate predictions using S3 method
+	sce_predictions <- predict(sce_model, Streamflow_testing_10var)
 
 	## Access different prediction components
-	training_predictions <- Results$Training
-	validation_predictions <- Results$Validation
-	testing_predictions <- Results$Testing
+	training_predictions <- sce_predictions$Training
+	validation_predictions <- sce_predictions$Validation
+	testing_predictions <- sce_predictions$Testing
 
-	## Calculate variable importance with OOB weighting (default)
-	Importance_weighted <- Wilks_importance(Model)
+	## Calculate variable importance using S3 method
+	sce_importance <- importance(sce_model)
 
-	## Calculate variable importance without OOB weighting
-	Importance_unweighted <- Wilks_importance(Model, OOB_weight = FALSE)
-
-	## Visualize the importance scores
-	Importance_ranking_sorted <- Importance_weighted[
-		order(-Importance_weighted$Relative_Importance), 
-	]
-	barplot(
-		Importance_ranking_sorted$Relative_Importance,
-		names.arg = Importance_ranking_sorted$Predictor,
-		las = 2,
-		col = "skyblue",
-		main = "Variable Importance (SCE)",
-		ylab = "Importance",
-		xlab = "Predictor"
+	## Evaluate SCE model performance using S3 method
+	sce_evaluation <- evaluate(
+		object = sce_model,
+		Testing_data = Streamflow_testing_10var,
+		Training_data = Streamflow_training_10var,
+		Predictant = Predictants
 	)
 }
 }

@@ -1,33 +1,41 @@
-\name{Model_evaluation}
+\name{evaluate}
+\alias{evaluate}
+\alias{evaluate.SCA}
+\alias{evaluate.SCE}
 \alias{SCA_Model_evaluation}
 \alias{SCE_Model_evaluation}
 
 \title{
-  Evaluate SCE and SCA Model Performances
+  Model Evaluation
 }
 
 \description{
-  These functions evaluate the performance of SCE and SCA models using six distinct metrics:
-  Mean Absolute Error (MAE), Root Mean Square Error (RMSE), Nash-Sutcliffe Efficiency (NSE),
-  Log-transformed NSE, R-squared, and Kling-Gupta Efficiency (KGE). The functions handle both
-  single and multiple predictants, with comprehensive input validation and proper handling of
-  NaN values and zero/negative values.
+  Functions for evaluating model performance using comprehensive metrics. The package provides both generic S3 methods and direct function calls for model evaluation.
 }
 
 \usage{
+evaluate(object, ...)
+
+\method{evaluate}{SCA}(object, Testing_data, Predictant, digits = 3, ...)
+
+\method{evaluate}{SCE}(object, Testing_data, Training_data, Predictant, digits = 3, ...)
+
 SCA_Model_evaluation(Testing_data, Simulations, Predictant, digits = 3)
 
 SCE_Model_evaluation(Testing_data, Training_data, Simulations, Predictant, digits = 3)
 }
 
 \arguments{
+  \item{object}{
+    An object for which performance should be evaluated.
+  }
   \item{Testing_data}{
     A data.frame containing the observations used during model testing.
     Must include all specified predictants.
   }
   \item{Training_data}{
     A data.frame containing the observations used during model training.
-    Required only for SCE_Model_evaluation.
+    Required only for SCE objects and \code{SCE_Model_evaluation}.
   }
   \item{Simulations}{
     A list containing model predictions:
@@ -45,16 +53,19 @@ SCE_Model_evaluation(Testing_data, Training_data, Simulations, Predictant, digit
     An integer specifying the number of decimal places to retain when reporting
     evaluation metrics. Default value is 3.
   }
+  \item{...}{
+    Additional arguments passed to methods.
+  }
 }
 
 \value{
-  For SCA_Model_evaluation:
+  For SCA models and \code{SCA_Model_evaluation}:
   \itemize{
     \item If single predictant: Returns a data.frame with column "Testing"
     \item If multiple predictants: Returns a list of data.frames, one for each predictant
   }
   
-  For SCE_Model_evaluation:
+  For SCE models and \code{SCE_Model_evaluation}:
   \itemize{
     \item If single predictant: Returns a data.frame with columns "Training", "Validation", and "Testing"
     \item If multiple predictants: Returns a list of data.frames, one for each predictant
@@ -72,6 +83,27 @@ SCE_Model_evaluation(Testing_data, Training_data, Simulations, Predictant, digit
 }
 
 \details{
+  \strong{Evaluation Metrics:}
+  
+  The functions evaluate model performance using six distinct metrics:
+  \enumerate{
+    \item \strong{MAE (Mean Absolute Error)}: Average absolute difference between observed and predicted values
+    \item \strong{RMSE (Root Mean Square Error)}: Square root of the average squared differences
+    \item \strong{NSE (Nash-Sutcliffe Efficiency)}: Measures the relative magnitude of residual variance compared to observed variance
+    \item \strong{Log.NSE}: NSE calculated on log-transformed values for better handling of skewed distributions
+    \item \strong{R2 (R-squared)}: Coefficient of determination from linear regression
+    \item \strong{KGE (Kling-Gupta Efficiency)}: Combines correlation, bias, and variability ratio
+  }
+  
+  \strong{Function Differences:}
+  \itemize{
+    \item \code{evaluate.SCA()}: S3 method for single SCA trees (calls \code{SCA_Model_evaluation})
+    \item \code{evaluate.SCE()}: S3 method for SCE ensembles (calls \code{SCE_Model_evaluation})
+    \item \code{SCA_Model_evaluation()}: Direct function for SCA model evaluation
+    \item \code{SCE_Model_evaluation()}: Direct function for SCE model evaluation
+  }
+  
+  \strong{Input Validation:}
   The functions perform comprehensive input validation:
   \enumerate{
     \item Data frame structure validation
@@ -81,7 +113,7 @@ SCE_Model_evaluation(Testing_data, Training_data, Simulations, Predictant, digit
     \item Proper handling of NaN values and zero/negative values
   }
   
-  The evaluation process:
+  \strong{Data Processing:}
   \enumerate{
     \item Removes NaN values from both observed and simulated data
     \item Handles zero or negative values by replacing them with 0.0001
@@ -95,5 +127,6 @@ SCE_Model_evaluation(Testing_data, Training_data, Simulations, Predictant, digit
 }
 
 \seealso{
-  \code{\link{SCE}}
+  \code{\link{SCA}}, \code{\link{SCE}}
 }
+
