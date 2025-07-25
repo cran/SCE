@@ -1,3 +1,13 @@
+# SCE 1.1.1
+
+## New Features
+* Added parameter validation warnings to `evaluate()` S3 methods
+  * `evaluate.SCA()` now automatically retrieves predictants from the model object (no need to specify)
+  * `evaluate.SCA()` now specifically warns if `Training_data` is provided (not needed for SCA evaluation)
+  * `evaluate.SCE()` now automatically retrieves predictants from the model object (no need to specify)
+  * Both methods now warn if extra parameters beyond required ones are provided
+* Enhanced user experience by providing clear guidance on correct parameter usage
+
 # SCE 1.1.0
 
 ## New Features

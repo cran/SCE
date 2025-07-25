@@ -1,9 +1,9 @@
-\name{Air_quality_training}
+\name{Air_quality_datasets}
 \alias{Air_quality_training}
 \alias{Air_quality_testing}
 
 \title{
-  Air Quality Datasets
+  Air Quality Dataset
 }
 
 \description{

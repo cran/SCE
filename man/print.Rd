@@ -1,43 +1,29 @@
-\name{print.SCA}
-\alias{print.SCA}
-\alias{summary.SCA}
+\name{print}
+\alias{print}
 \alias{print.SCE}
-\alias{summary.SCE}
-
+\alias{print.SCA}
 \title{
-  Print and Summary Methods for SCA and SCE Objects
+  Print SCE and SCA Model Objects
 }
-
 \description{
-  Methods for printing and summarizing SCA (Stepwise Cluster Analysis) and SCE (Stepwise Clustered Ensemble) objects.
+  Print information about SCE or SCA model objects.
 }
-
 \usage{
-\method{print}{SCA}(x, ...)
-
-\method{summary}{SCA}(object, ...)
-
 \method{print}{SCE}(x, ...)
-
-\method{summary}{SCE}(object, ...)
+\method{print}{SCA}(x, ...)
 }
-
 \arguments{
-  \item{x, object}{
-    An SCA or SCE object returned by the \code{SCA()} or \code{SCE()} function.
-  }
-  \item{...}{
-    Additional arguments passed to methods.
-  }
+  \item{x}{An SCE or SCA model object}
+  \item{...}{Additional arguments (not used)}
 }
-
 \value{
-  \code{print.SCA} and \code{print.SCE} return the object invisibly.
-  \code{summary.SCA} returns a summary of the SCA model including tree statistics.
-  \code{summary.SCE} returns a summary of the SCE model including ensemble statistics.
+  Prints model information and returns the object invisibly.
 }
+\details{
+  For SCE objects, prints ensemble information including number of trees, parameters, predictors, predictants, and OOB performance metrics.
 
-\seealso{
-  \code{\link{SCA}}, \code{\link{SCE}}
+  For SCA objects, prints tree structure information including total nodes, leaf nodes, cutting/merging actions, and variable names.
 }
- 
+\seealso{
+  \code{\link{SCE}}, \code{\link{SCA}}, \code{\link{summary}}
+} 
