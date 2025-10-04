@@ -10,6 +10,7 @@ export(print)
 export(predict)
 export(importance)
 export(evaluate)
+export(summary)
 export(RFE_SCE)
 export(Plot_RFE)
 

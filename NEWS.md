@@ -1,3 +1,17 @@
+# SCE 1.1.2
+
+## New Features
+* Added `digits` argument for variable importance outputs
+  * `Wilks_importance()` and `SCA_importance()` now round `Relative_Importance` to `digits` decimal places (default: 2)
+  * S3 methods `importance.SCE()` and `importance.SCA()` accept and forward the `digits` argument
+
+## Documentation
+* Updated `man/importance.Rd` to document the `digits` parameter and default
+* Updated README examples to demonstrate `importance(..., digits = 2)`
+
+## Compatibility
+* Backward compatible; only changes displayed precision of importance values. Adjust `digits` to control rounding
+
 # SCE 1.1.1
 
 ## New Features
