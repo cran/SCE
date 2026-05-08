@@ -1,7 +1,7 @@
 \name{importance}
 \alias{importance}
-\alias{importance.SCE}
-\alias{importance.SCA}
+\alias{importance.sce}
+\alias{importance.sca}
 \title{
   Variable Importance for SCE and SCA Models
 }
@@ -9,8 +9,8 @@
   Calculate variable importance for SCE or SCA models.
 }
 \usage{
-\method{importance}{SCE}(object, OOB_weight = TRUE, digits = 2, ...)
-\method{importance}{SCA}(object, digits = 2, ...)
+\method{importance}{sce}(object, OOB_weight = TRUE, digits = 2, ...)
+\method{importance}{sca}(object, digits = 2, ...)
 }
 \arguments{
   \item{object}{An SCE or SCA model object}
@@ -23,5 +23,5 @@
 }
 
 \seealso{
-  \code{\link{SCE}}, \code{\link{SCA}}, \code{\link{RFE_SCE}}
+  \code{\link{sce}}, \code{\link{sca}}, \code{\link{rfe_sce}}
 } 

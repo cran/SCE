@@ -1,8 +1,8 @@
-\name{Streamflow_datasets}
-\alias{Streamflow_training_10var}
-\alias{Streamflow_training_22var}
-\alias{Streamflow_testing_10var}
-\alias{Streamflow_testing_22var}
+\name{streamflow_datasets}
+\alias{streamflow_training_10var}
+\alias{streamflow_training_22var}
+\alias{streamflow_testing_10var}
+\alias{streamflow_testing_22var}
 
 \title{
   Streamflow Dataset
@@ -13,20 +13,20 @@
 }
 
 \usage{
-data("Streamflow_training_10var")
-data("Streamflow_training_22var")
-data("Streamflow_testing_10var")
-data("Streamflow_testing_22var")
+data("streamflow_training_10var")
+data("streamflow_training_22var")
+data("streamflow_testing_10var")
+data("streamflow_testing_22var")
 }
 
 \format{
-  \strong{Streamflow_training_10var:} Basic environmental variables (12 columns):
+  \strong{streamflow_training_10var:} Basic environmental variables (12 columns):
   \describe{
     \item{Date}{Date and time of measurement}
     \item{Prcp}{Monthly mean daily precipitation (mm)}
     \item{SRad}{Monthly mean daily solar radiation (W/m^2)}
-    \item{Tmax}{Monthly mean daily maximum temperature (°C)}
-    \item{Tmin}{Monthly mean daily minimum temperature (°C)}
+    \item{Tmax}{Monthly mean daily maximum temperature (\eqn{^\circ}{deg}C)}
+    \item{Tmin}{Monthly mean daily minimum temperature (\eqn{^\circ}{deg}C)}
     \item{VP}{Monthly mean daily vapor pressure (Pa)}
     \item{smlt}{Monthly snowmelt (m)}
     \item{swvl1}{Soil water content layer 1 (m^3/m^3)}
@@ -36,7 +36,7 @@ data("Streamflow_testing_22var")
     \item{Flow}{Monthly mean daily streamflow (cfs)}
   }
   
-  \strong{Streamflow_training_22var:} Extended variables with climate indices (24 columns):
+  \strong{streamflow_training_22var:} Extended variables with climate indices (24 columns):
   \describe{
     \item{Flow}{Streamflow measurements}
     \item{IPO}{Interdecadal Pacific Oscillation}
@@ -75,7 +75,7 @@ data("Streamflow_testing_22var")
     \item \strong{Testing datasets}: Used for model evaluation
   }
   
-  \strong{Climate Indices:} IPO (Interdecadal Pacific Oscillation), Nino3.4 (El Niño), PDO (Pacific Decadal Oscillation), PNA (Pacific North American pattern)
+  \strong{Climate Indices:} IPO (Interdecadal Pacific Oscillation), Nino3.4 (El Nino), PDO (Pacific Decadal Oscillation), PNA (Pacific North American pattern)
   
   \strong{Data Sources:} ERA5 Land, Daymet, USGS, and climate indices databases
 }

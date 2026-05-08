@@ -1,7 +1,7 @@
 \name{print}
 \alias{print}
-\alias{print.SCE}
-\alias{print.SCA}
+\alias{print.sce}
+\alias{print.sca}
 \title{
   Print SCE and SCA Model Objects
 }
@@ -9,8 +9,8 @@
   Print information about SCE or SCA model objects.
 }
 \usage{
-\method{print}{SCE}(x, ...)
-\method{print}{SCA}(x, ...)
+\method{print}{sce}(x, ...)
+\method{print}{sca}(x, ...)
 }
 \arguments{
   \item{x}{An SCE or SCA model object}
@@ -25,5 +25,5 @@
   For SCA objects, prints tree structure information including total nodes, leaf nodes, cutting/merging actions, and variable names.
 }
 \seealso{
-  \code{\link{SCE}}, \code{\link{SCA}}, \code{\link{summary}}
+  \code{\link{sce}}, \code{\link{sca}}, \code{\link{summary}}
 } 

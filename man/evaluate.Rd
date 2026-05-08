@@ -1,7 +1,7 @@
 \name{evaluate}
 \alias{evaluate}
-\alias{evaluate.SCE}
-\alias{evaluate.SCA}
+\alias{evaluate.sce}
+\alias{evaluate.sca}
 \title{
   Evaluate SCE and SCA Model Performance
 }
@@ -9,8 +9,8 @@
   Evaluate model performance for SCE or SCA models.
 }
 \usage{
-\method{evaluate}{SCE}(object, Testing_data, Training_data, digits = 3, ...)
-\method{evaluate}{SCA}(object, Testing_data, Training_data, digits = 3, ...)
+\method{evaluate}{sce}(object, Testing_data, Training_data, digits = 3, ...)
+\method{evaluate}{sca}(object, Testing_data, Training_data, digits = 3, ...)
 }
 \arguments{
   \item{object}{An SCE or SCA model object}
@@ -24,5 +24,5 @@
 }
 
 \seealso{
-  \code{\link{SCE}}, \code{\link{SCA}}, \code{\link{predict}}
+  \code{\link{sce}}, \code{\link{sca}}, \code{\link{predict}}
 } 

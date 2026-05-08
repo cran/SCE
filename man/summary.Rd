@@ -1,7 +1,7 @@
 \name{summary}
 \alias{summary}
-\alias{summary.SCE}
-\alias{summary.SCA}
+\alias{summary.sce}
+\alias{summary.sca}
 \title{
   Summary methods for SCE and SCA models
 }
@@ -9,20 +9,20 @@
   Provide concise summaries of model structure and performance for SCE and SCA objects.
 }
 \usage{
-\method{summary}{SCE}(object, ...)
-\method{summary}{SCA}(object, ...)
+\method{summary}{sce}(object, ...)
+\method{summary}{sca}(object, ...)
 }
 \arguments{
   \item{object}{An SCE or SCA model object}
   \item{...}{Additional arguments passed to or ignored by methods}
 }
 \details{
-For \code{summary.SCE}, the method prints ensemble configuration, out-of-bag (OOB) performance statistics, tree structure information, and tree weight distribution.\\
-For \code{summary.SCA}, the method prints tree structure information and variable summaries for the single SCA tree.
+For \code{summary.sce}, the method prints ensemble configuration, out-of-bag (OOB) performance statistics, tree structure information, and tree weight distribution.\\
+For \code{summary.sca}, the method prints tree structure information and variable summaries for the single SCA tree.
 }
 \value{
   Invisibly returns the input \code{object} after printing the summary.
 }
 \seealso{
-  \code{\link{SCE}}, \code{\link{SCA}}, \code{\link{print}}, \code{\link{importance}}, \code{\link{evaluate}}
+  \code{\link{sce}}, \code{\link{sca}}, \code{\link{print}}, \code{\link{importance}}, \code{\link{evaluate}}
 }

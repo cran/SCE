@@ -1,3 +1,17 @@
+# SCE 1.1.3
+
+## Breaking changes (API style)
+* Per common R conventions, **all exported function names now use lowercase** (including main constructors `sce()` and `sca()`).
+* S3 **class names** are now `"sce"` and `"sca"` (previously `"SCE"` and `"SCA"`). Method names follow (`print.sce`, `predict.sca`, etc.).
+* Renamed functions include (non-exhaustive): `model_simulation()`, `sca_tree_predict()`, `sce_model_evaluation()`, `sca_model_evaluation()`, `wilks_importance()`, `sca_importance()`, `rfe_sce()`, `plot_rfe()`, and internal helpers such as `sce_prediction()`, `training_prediction()`, `oob_validation()`, `gof()`, `nse_equation()`, `kge_equation()`, `inference()`.
+* **Saved `.RDS` / `.RData` models** created with older versions store the previous class names; assign new classes before using S3 methods, e.g. `class(obj) <- "sce"` or `class(obj) <- "sca"` as appropriate.
+
+## Bug fixes
+* `sce(parallel = TRUE)` no longer fails on single-core machines (or when `Ntree == 1`); it now falls back to sequential execution instead of leaving the result vector undefined. The cluster is also released via `on.exit()` so a worker error no longer leaks the cluster.
+
+## Documentation
+* Updated `README.md`, tutorial script, and manual pages to match the new function and dataset names.
+
 # SCE 1.1.2
 
 ## New Features

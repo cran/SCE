@@ -1,4 +1,5 @@
-\name{SCE}
+\name{sce}
+\alias{sce}
 \alias{SCE}
 \title{
   Stepwise Clustered Ensemble (SCE)
@@ -7,7 +8,7 @@
   Builds a Stepwise Clustered Ensemble (SCE) model, which is an ensemble of SCA trees built using bootstrap samples and random feature selection, providing improved prediction accuracy and robustness.
 }
 \usage{
-SCE(Training_data, X, Y, mfeature, Nmin, Ntree, alpha = 0.05, 
+sce(Training_data, X, Y, mfeature, Nmin, Ntree, alpha = 0.05,
     resolution = 1000, verbose = FALSE, parallel = TRUE)
 }
 \arguments{
@@ -23,21 +24,21 @@ SCE(Training_data, X, Y, mfeature, Nmin, Ntree, alpha = 0.05,
   \item{parallel}{Use parallel processing (default: TRUE)}
 }
 \value{
-  An S3 object of class "SCE" containing the ensemble model.
+  An S3 object of class \code{"sce"} containing the ensemble model.
 }
 \examples{
 \donttest{
   # Load example data
-  data(Streamflow_training_10var)
-  data(Streamflow_testing_10var)
-  
+  data(streamflow_training_10var)
+  data(streamflow_testing_10var)
+
   # Define variables
   Predictors <- c("Prcp","SRad","Tmax","Tmin","VP","smlt","swvl1","swvl2","swvl3","swvl4")
   Predictants <- c("Flow")
-  
+
   # Build SCE model
-  sce_model <- SCE(
-    Training_data = Streamflow_training_10var,
+  sce_model <- sce(
+    Training_data = streamflow_training_10var,
     X = Predictors,
     Y = Predictants,
     mfeature = round(0.5 * length(Predictors)),
@@ -47,15 +48,15 @@ SCE(Training_data, X, Y, mfeature, Nmin, Ntree, alpha = 0.05,
     resolution = 1000,
     parallel = FALSE
   )
-  
+
   # Use S3 methods
   print(sce_model)
   summary(sce_model)
-  sce_predictions <- predict(sce_model, Streamflow_testing_10var)
+  sce_predictions <- predict(sce_model, streamflow_testing_10var)
   sce_importance <- importance(sce_model)
-  sce_evaluation <- evaluate(sce_model, Streamflow_testing_10var, Streamflow_training_10var)
+  sce_evaluation <- evaluate(sce_model, streamflow_testing_10var, streamflow_training_10var)
 }
 }
 \seealso{
-  \code{\link{SCA}}, \code{\link{predict}}, \code{\link{importance}}, \code{\link{evaluate}}
-} 
+  \code{\link{sca}}, \code{\link{predict}}, \code{\link{importance}}, \code{\link{evaluate}}
+}

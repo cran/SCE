@@ -1,7 +1,7 @@
 \name{predict}
 \alias{predict}
-\alias{predict.SCE}
-\alias{predict.SCA}
+\alias{predict.sce}
+\alias{predict.sca}
 \title{
   Predict Using SCE and SCA Models
 }
@@ -9,8 +9,8 @@
   Make predictions on new data using SCE or SCA models.
 }
 \usage{
-\method{predict}{SCE}(object, newdata, ...)
-\method{predict}{SCA}(object, newdata, ...)
+\method{predict}{sce}(object, newdata, ...)
+\method{predict}{sca}(object, newdata, ...)
 }
 \arguments{
   \item{object}{An SCE or SCA model object}
@@ -22,5 +22,5 @@
 }
 
 \seealso{
-  \code{\link{SCE}}, \code{\link{SCA}}, \code{\link{evaluate}}
+  \code{\link{sce}}, \code{\link{sca}}, \code{\link{evaluate}}
 } 
