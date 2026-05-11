@@ -8,17 +8,17 @@
   Recursive Feature Elimination for SCE models to identify the most important predictors.
 }
 \usage{
-rfe_sce(Training_data, Testing_data, Predictors, Predictant, Nmin, Ntree,
+rfe_sce(training_data, testing_data, predictors, predictant, nmin, ntree,
         alpha = 0.05, resolution = 1000, step = 1, verbose = TRUE,
         parallel = TRUE)
 }
 \arguments{
-  \item{Training_data}{Training dataset}
-  \item{Testing_data}{Testing dataset}
-  \item{Predictors}{Character vector of predictor names}
-  \item{Predictant}{Character vector of predictant names}
-  \item{Nmin}{Minimum samples per node}
-  \item{Ntree}{Number of trees}
+  \item{training_data}{Training dataset}
+  \item{testing_data}{Testing dataset}
+  \item{predictors}{Character vector of predictor names}
+  \item{predictant}{Character vector of predictant names}
+  \item{nmin}{Minimum samples per node}
+  \item{ntree}{Number of trees}
   \item{alpha}{Significance level (default: 0.05)}
   \item{resolution}{Resolution for splitting (default: 1000)}
   \item{step}{Number of predictors to remove per iteration (default: 1)}

@@ -2,12 +2,12 @@
 # This script implements RFE to identify the most important predictors for SCE models
 
 rfe_sce <- function(
-  Training_data,
-  Testing_data,
-  Predictors,
-  Predictant,
-  Nmin,
-  Ntree,
+  training_data,
+  testing_data,
+  predictors,
+  predictant,
+  nmin,
+  ntree,
   alpha = 0.05,
   resolution = 1000,
   step = 1,  # Number of predictors to remove at each iteration
@@ -15,24 +15,24 @@ rfe_sce <- function(
   parallel = TRUE  # Control parallel processing
 ) {
   # Input validation
-  if (!is.data.frame(Training_data) || !is.data.frame(Testing_data)) {
+  if (!is.data.frame(training_data) || !is.data.frame(testing_data)) {
     stop("All data inputs must be data frames")
   }
   
-  if (!is.character(Predictors) || length(Predictors) < 2) {
-    stop("Predictors must be a character vector with at least 2 elements")
+  if (!is.character(predictors) || length(predictors) < 2) {
+    stop("predictors must be a character vector with at least 2 elements")
   }
   
-  if (!is.character(Predictant) || length(Predictant) == 0) {
-    stop("Predictant must be a non-empty character vector")
+  if (!is.character(predictant) || length(predictant) == 0) {
+    stop("predictant must be a non-empty character vector")
   }
   
-  if (!is.numeric(step) || step < 1 || step > length(Predictors) - length(Predictant)) {
+  if (!is.numeric(step) || step < 1 || step > length(predictors) - length(predictant)) {
     stop("step must be a positive integer less than or equal to the number of predictors minus the number of predictants")
   }
   
   # Initialize variables
-  current_predictors <- Predictors
+  current_predictors <- predictors
   history <- list(
     summary = data.frame(
       n_predictors = integer(),
@@ -46,7 +46,7 @@ rfe_sce <- function(
   )
   
   # Main RFE loop
-  while (length(current_predictors) > (length(Predictant)+2) ) {
+  while (length(current_predictors) > (length(predictant)+2) ) {
     if (verbose) {
       message("Evaluating model with ", length(current_predictors), " predictors: ", 
               paste(current_predictors, collapse = ", "))
@@ -54,13 +54,13 @@ rfe_sce <- function(
     
     # Train SCE model
     model <- sce(
-      Training_data = Training_data,
-      X = current_predictors,
-      Y = Predictant,
+      training_data = training_data,
+      x = current_predictors,
+      y = predictant,
       mfeature = round(length(current_predictors)/2),
-      Ntree = Ntree,
+      ntree = ntree,
       alpha = alpha,
-      Nmin = Nmin,
+      nmin = nmin,
       resolution = resolution,
       verbose = verbose,
       parallel = parallel
@@ -69,15 +69,15 @@ rfe_sce <- function(
     # Get predictions
     predictions <- model_simulation(
       model = model,
-      Testing_data = Testing_data
+      testing_data = testing_data
     )
     
     # Evaluate model
     evaluation <- sce_model_evaluation(
-      Testing_data = Testing_data,
-      Training_data = Training_data,
-      Simulations = predictions,
-      Predictant = Predictant,
+      testing_data = testing_data,
+      training_data = training_data,
+      simulations = predictions,
+      predictant = predictant,
       digits = 3
     )
     
@@ -104,7 +104,7 @@ rfe_sce <- function(
     ))
     
     # Store performance data frames
-    if (length(Predictant) == 1) {
+    if (length(predictant) == 1) {
       history$performances[[length(history$performances) + 1]] <- evaluation
     } else {
       # For multiple predictants, store each predictant's performance
@@ -120,7 +120,7 @@ rfe_sce <- function(
     history$importance_scores[[length(history$importance_scores) + 1]] <- importance_scores
 
     # Remove step number of least important predictors
-    least_important <- importance_scores$Predictor[order(importance_scores$Relative_Importance)[1:min(step, length(current_predictors) - length(Predictant))]]
+    least_important <- importance_scores$Predictor[order(importance_scores$Relative_Importance)[1:min(step, length(current_predictors) - length(predictant))]]
     current_predictors <- setdiff(current_predictors, least_important)
   }
   

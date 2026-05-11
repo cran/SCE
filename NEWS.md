@@ -3,6 +3,14 @@
 ## Breaking changes (API style)
 * Per common R conventions, **all exported function names now use lowercase** (including main constructors `sce()` and `sca()`).
 * S3 **class names** are now `"sce"` and `"sca"` (previously `"SCE"` and `"SCA"`). Method names follow (`print.sce`, `predict.sca`, etc.).
+* **All function arguments now use lowercase / snake_case.** Renamed arguments include:
+  * `Training_data` -> `training_data`, `Testing_data` -> `testing_data`
+  * `X` -> `x`, `Y` -> `y`, `X_sample` -> `x_sample`
+  * `Nmin` -> `nmin`, `Ntree` -> `ntree`
+  * `Predictors` -> `predictors`, `Predictant` -> `predictant`, `Simulations` -> `simulations`
+  * `OOB_weight` -> `oob_weight`
+  * Internal helpers: `Max_merge_iter` -> `max_merge_iter`, `Weak_L` -> `weak_l`
+  * Affected functions: `sce()`, `sca()`, `rfe_sce()`, `model_simulation()`, `sca_tree_predict()`, `sce_model_evaluation()`, `sca_model_evaluation()`, `wilks_importance()`, S3 methods `predict.*`, `importance.*`, `evaluate.*`, etc.
 * Renamed functions include (non-exhaustive): `model_simulation()`, `sca_tree_predict()`, `sce_model_evaluation()`, `sca_model_evaluation()`, `wilks_importance()`, `sca_importance()`, `rfe_sce()`, `plot_rfe()`, and internal helpers such as `sce_prediction()`, `training_prediction()`, `oob_validation()`, `gof()`, `nse_equation()`, `kge_equation()`, `inference()`.
 * **Saved `.RDS` / `.RData` models** created with older versions store the previous class names; assign new classes before using S3 methods, e.g. `class(obj) <- "sce"` or `class(obj) <- "sca"` as appropriate.
 

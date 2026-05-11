@@ -48,92 +48,92 @@ gof <- function(obs, sim, digits=4)
   return(gof_mat)
 }
 
-sca_model_evaluation <- function(Testing_data, Simulations, Predictant, digits=3)
+sca_model_evaluation <- function(testing_data, simulations, predictant, digits=3)
 {
   # Input validation
   
-  if (!is.character(Predictant) || length(Predictant) == 0) {
-    stop("Predictant must be a non-empty character vector")
+  if (!is.character(predictant) || length(predictant) == 0) {
+    stop("predictant must be a non-empty character vector")
   }
   
   # Check if predictants exist in data
-  missing_predictants <- Predictant[!Predictant %in% colnames(Testing_data)]
+  missing_predictants <- predictant[!predictant %in% colnames(testing_data)]
   if (length(missing_predictants) > 0) {
-    stop(sprintf("The following predictants are not found in Testing_data: %s", 
+    stop(sprintf("The following predictants are not found in testing_data: %s", 
                 paste(missing_predictants, collapse = ", ")))
   }
   
   # Check row count match
-  if (nrow(Testing_data) != nrow(Simulations)) {
-    stop("The number of rows in Testing_data must be equal to the number of rows in Testing_sim")
+  if (nrow(testing_data) != nrow(simulations)) {
+    stop("The number of rows in testing_data must be equal to the number of rows in simulations")
   }
   
   # For SCA, we only evaluate testing performance
   all_results <- list()
-  for(pred in Predictant) {
-    Testing_GOF <- gof(obs=Testing_data[,pred], sim=Simulations[,pred], digits=digits)
+  for(pred in predictant) {
+    Testing_GOF <- gof(obs=testing_data[,pred], sim=simulations[,pred], digits=digits)
     GOF_res <- data.frame(Testing=Testing_GOF)
     colnames(GOF_res) <- "Testing"
     all_results[[pred]] <- GOF_res
   }
   
-  if(length(Predictant) == 1) {
+  if(length(predictant) == 1) {
     return(all_results[[1]])
   }
   return(all_results)
 }
 
-sce_model_evaluation <- function(Testing_data, Training_data, Simulations, Predictant, digits=3)
+sce_model_evaluation <- function(testing_data, training_data, simulations, predictant, digits=3)
 {
   # Input validation
-  if (!is.list(Simulations) || !all(c("Training", "Validation", "Testing") %in% names(Simulations))) {
-    stop("Simulations must be a list with 'Training', 'Validation', and 'Testing' components")
+  if (!is.list(simulations) || !all(c("Training", "Validation", "Testing") %in% names(simulations))) {
+    stop("simulations must be a list with 'Training', 'Validation', and 'Testing' components")
   }
   
-  if (!is.character(Predictant) || length(Predictant) == 0) {
-    stop("Predictant must be a non-empty character vector")
+  if (!is.character(predictant) || length(predictant) == 0) {
+    stop("predictant must be a non-empty character vector")
   }
   
   # Check if predictants exist in data
-  missing_predictants <- Predictant[!Predictant %in% colnames(Testing_data)]
+  missing_predictants <- predictant[!predictant %in% colnames(testing_data)]
   if (length(missing_predictants) > 0) {
     stop(sprintf("The following predictants are not found in the data: %s", 
                 paste(missing_predictants, collapse = ", ")))
   }
   
   # Check if predictants exist in simulations
-  for (pred in Predictant) {
+  for (pred in predictant) {
     for (set in c("Training", "Validation", "Testing")) {
-      if (!pred %in% colnames(Simulations[[set]])) {
-        stop(sprintf("Predictant '%s' not found in %s simulations", pred, set))
+      if (!pred %in% colnames(simulations[[set]])) {
+        stop(sprintf("predictant '%s' not found in %s simulations", pred, set))
       }
     }
   }
 
   # Total training data rows much be equal to the number of rows in the training simulations
-  if (nrow(Training_data) != nrow(Simulations[["Training"]])) {
-    stop("The number of rows in Training_data must be equal to the number of rows in the Training simulations")
+  if (nrow(training_data) != nrow(simulations[["Training"]])) {
+    stop("The number of rows in training_data must be equal to the number of rows in the Training simulations")
   }
 
   # total training data rows must be equal to the number of rows in the validation simulations
-  if (nrow(Training_data) != nrow(Simulations[["Validation"]])) {
-    stop("The number of rows in Training_data must be equal to the number of rows in the Validation simulations")
+  if (nrow(training_data) != nrow(simulations[["Validation"]])) {
+    stop("The number of rows in training_data must be equal to the number of rows in the Validation simulations")
   }
 
   # total testing data rows must be equal to the number of rows in the testing simulations
-  if (nrow(Testing_data) != nrow(Simulations[["Testing"]])) {
-    stop("The number of rows in Testing_data must be equal to the number of rows in the Testing simulations")
+  if (nrow(testing_data) != nrow(simulations[["Testing"]])) {
+    stop("The number of rows in testing_data must be equal to the number of rows in the Testing simulations")
   }
   
   # Initialize a list to store results for each predictant
   all_results <- list()
   
   # Loop through each predictant
-  for(pred in Predictant) {
+  for(pred in predictant) {
     # Calculate GOF for each predictant
-    Training_GOF <- gof(obs=Training_data[,pred],sim=Simulations[["Training"]][,pred],digits=digits)
-    Validation_GOF <- gof(obs=Training_data[,pred],sim=Simulations[["Validation"]][,pred],digits=digits)
-    Testing_GOF <- gof(obs=Testing_data[,pred],sim=Simulations[["Testing"]][,pred],digits=digits)
+    Training_GOF <- gof(obs=training_data[,pred],sim=simulations[["Training"]][,pred],digits=digits)
+    Validation_GOF <- gof(obs=training_data[,pred],sim=simulations[["Validation"]][,pred],digits=digits)
+    Testing_GOF <- gof(obs=testing_data[,pred],sim=simulations[["Testing"]][,pred],digits=digits)
     
     # Combine results for this predictant
     GOF_res <- data.frame(Training_GOF,Validation_GOF,Testing_GOF)
@@ -144,7 +144,7 @@ sce_model_evaluation <- function(Testing_data, Training_data, Simulations, Predi
   }
   
   # If there's only one predictant, return the single result
-  if(length(Predictant) == 1) {
+  if(length(predictant) == 1) {
     return(all_results[[1]])
   }
   

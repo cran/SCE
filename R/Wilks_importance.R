@@ -5,7 +5,7 @@
 # Author: 		Kailong Li
 # Email:		lkl98509509@gmail.com
 # ===============================================================
-wilks_importance <- function(model, OOB_weight = TRUE, digits = 2)
+wilks_importance <- function(model, oob_weight = TRUE, digits = 2)
 {
   # Handle S3 class objects
   if (inherits(model, "sce")) {
@@ -57,7 +57,7 @@ wilks_importance <- function(model, OOB_weight = TRUE, digits = 2)
   # Remove NULL results
   Imp <- Imp[!sapply(Imp, is.null)]
   
-  if (OOB_weight == TRUE)
+  if (oob_weight == TRUE)
   {
     #: importance of each tree will be weighted by OOB error
     Imp_final <- mapply(function(x, y) {

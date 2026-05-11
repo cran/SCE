@@ -20,7 +20,7 @@ sca_object <- function(tree, map, predictors, predictants, type, total_nodes, le
 # ---------------------------------------------------------------
 # Interface function
 # ---------------------------------------------------------------
-sca <- function(Training_data, X, Y, Nmin, alpha = 0.05, resolution = 1000, verbose = FALSE)
+sca <- function(training_data, x, y, nmin, alpha = 0.05, resolution = 1000, verbose = FALSE)
 {
   # Store the function call
   call <- match.call()
@@ -33,28 +33,28 @@ sca <- function(Training_data, X, Y, Nmin, alpha = 0.05, resolution = 1000, verb
     stop("alpha must be a number between 0 and 1")
   }
   
-  if (!is.data.frame(Training_data) && !is.matrix(Training_data)) {
-    stop("Training_data must be a data frame or matrix")
+  if (!is.data.frame(training_data) && !is.matrix(training_data)) {
+    stop("training_data must be a data frame or matrix")
   }
   
-  if (nrow(Training_data) == 0) {
-    stop("Training_data is empty")
+  if (nrow(training_data) == 0) {
+    stop("training_data is empty")
   }
   
-  if (!all(X %in% colnames(Training_data))) {
-    missing_vars <- setdiff(X, colnames(Training_data))
-    stop(sprintf("The following predictors are not found in Training_data: %s", 
+  if (!all(x %in% colnames(training_data))) {
+    missing_vars <- setdiff(x, colnames(training_data))
+    stop(sprintf("The following predictors are not found in training_data: %s", 
                 paste(missing_vars, collapse = ", ")))
   }
   
-  if (!all(Y %in% colnames(Training_data))) {
-    missing_vars <- setdiff(Y, colnames(Training_data))
-    stop(sprintf("The following predictants are not found in Training_data: %s", 
+  if (!all(y %in% colnames(training_data))) {
+    missing_vars <- setdiff(y, colnames(training_data))
+    stop(sprintf("The following predictants are not found in training_data: %s", 
                 paste(missing_vars, collapse = ", ")))
   }
   
-  if (!is.numeric(Nmin) || Nmin <= 0) {
-    stop("Nmin must be a positive number")
+  if (!is.numeric(nmin) || nmin <= 0) {
+    stop("nmin must be a positive number")
   }
   
   if (!is.numeric(resolution) || resolution <= 0) {
@@ -62,19 +62,19 @@ sca <- function(Training_data, X, Y, Nmin, alpha = 0.05, resolution = 1000, verb
   }
   
   # Check for missing values
-  if (any(is.na(Training_data[, X])) || any(is.na(Training_data[, Y]))) {
-    stop("Training_data contains missing values")
+  if (any(is.na(training_data[, x])) || any(is.na(training_data[, y]))) {
+    stop("training_data contains missing values")
   }
   
   # Check data types
-  if (!all(sapply(Training_data[, X], is.numeric))) {
-    non_numeric <- names(which(!sapply(Training_data[, X], is.numeric)))
+  if (!all(sapply(training_data[, x], is.numeric))) {
+    non_numeric <- names(which(!sapply(training_data[, x], is.numeric)))
     stop(sprintf("The following predictors are not numeric: %s", 
                 paste(non_numeric, collapse = ", ")))
   }
   
-  if (!all(sapply(Training_data[, Y], is.numeric))) {
-    non_numeric <- names(which(!sapply(Training_data[, Y], is.numeric)))
+  if (!all(sapply(training_data[, y], is.numeric))) {
+    non_numeric <- names(which(!sapply(training_data[, y], is.numeric)))
     stop(sprintf("The following predictants are not numeric: %s", 
                 paste(non_numeric, collapse = ", ")))
   }
@@ -83,8 +83,8 @@ sca <- function(Training_data, X, Y, Nmin, alpha = 0.05, resolution = 1000, verb
   data <- list()
   
   #: store input data
-  data$o_sample_data_x <- as.matrix(Training_data[, X])
-  data$o_sample_data_y <- as.matrix(Training_data[, Y])
+  data$o_sample_data_x <- as.matrix(training_data[, x])
+  data$o_sample_data_y <- as.matrix(training_data[, y])
   
   #: store dimensions
   data$n_sample_size <- nrow(data$o_sample_data_x)
@@ -92,26 +92,26 @@ sca <- function(Training_data, X, Y, Nmin, alpha = 0.05, resolution = 1000, verb
   data$n_sample_y_cols <- ncol(data$o_sample_data_y)
   
   # Check minimum sample size
-  if (data$n_sample_size < Nmin) {
-    stop(sprintf("Sample size (%d) is less than Nmin (%d)", 
-                data$n_sample_size, Nmin))
+  if (data$n_sample_size < nmin) {
+    stop(sprintf("Sample size (%d) is less than nmin (%d)", 
+                data$n_sample_size, nmin))
   }
   
   #: store parameters
   data$n_alpha <- alpha
   data$n_mapvalue <- "mean"  
   data$resolution <- resolution
-  data$Nmin <- Nmin
+  data$nmin <- nmin
   
   #: do clustering
-  result <- do_cluster(data = data, Nmin = Nmin, resolution = resolution, verbose = verbose)
+  result <- do_cluster(data = data, nmin = nmin, resolution = resolution, verbose = verbose)
 
   #: return the S3 class object
   return(sca_object(
     tree = result$Tree,
     map = result$Map,
-    predictors = X,
-    predictants = Y,
+    predictors = x,
+    predictants = y,
     type = data$n_mapvalue,
     total_nodes = result$totalNodes,
     leaf_nodes = result$leafNodes,
@@ -121,33 +121,33 @@ sca <- function(Training_data, X, Y, Nmin, alpha = 0.05, resolution = 1000, verb
   ))
 }
 
-sca_tree_predict <- function(model, Testing_data) {
+sca_tree_predict <- function(model, testing_data) {
   # Input validation
   if (is.null(model)) {
     stop("model must be an sca object or list")
   }
   
-  if (is.null(Testing_data)) {
-    stop("Testing_data must be a data frame or matrix")
+  if (is.null(testing_data)) {
+    stop("testing_data must be a data frame or matrix")
   }
   
-  if (!is.data.frame(Testing_data) && !is.matrix(Testing_data)) {
-    stop("Testing_data must be a data frame or matrix")
+  if (!is.data.frame(testing_data) && !is.matrix(testing_data)) {
+    stop("testing_data must be a data frame or matrix")
   }
   
-  if (nrow(Testing_data) == 0) {
-    stop("Testing_data is empty")
+  if (nrow(testing_data) == 0) {
+    stop("testing_data is empty")
   }
   
   # Check if all required predictors are present in test data
-  if (!all(model$XName %in% colnames(Testing_data))) {
-    missing_vars <- setdiff(model$XName, colnames(Testing_data))
-    stop(sprintf("The following predictors are not found in Testing_data: %s", 
+  if (!all(model$XName %in% colnames(testing_data))) {
+    missing_vars <- setdiff(model$XName, colnames(testing_data))
+    stop(sprintf("The following predictors are not found in testing_data: %s", 
                 paste(missing_vars, collapse = ", ")))
   }
   
   # Initialize Test_X
-  Test_X <- Testing_data[,model$XName]
+  Test_X <- testing_data[, model$XName]
   
   # Initialize data structure
   data <- list()
@@ -239,7 +239,7 @@ predict.sca <- function(object, newdata, ...) {
     stop("newdata is required for prediction")
   }
   
-  return(sca_tree_predict(model = object, Testing_data = newdata))
+  return(sca_tree_predict(model = object, testing_data = newdata))
 }
 
 # Importance method for SCA objects
@@ -249,17 +249,17 @@ importance.sca <- function(object, digits = 2, ...) {
 }
 
 # Evaluate method for SCA objects
-evaluate.sca <- function(object, Testing_data, Training_data, digits = 3, ...) {
+evaluate.sca <- function(object, testing_data, training_data, digits = 3, ...) {
   # This is a wrapper for sca_model_evaluation
-  if (missing(Testing_data)) {
-    stop("Testing_data is required for evaluation")
+  if (missing(testing_data)) {
+    stop("testing_data is required for evaluation")
   }
-  if (missing(Training_data)) {
-    stop("Training_data is required for evaluation")
+  if (missing(training_data)) {
+    stop("training_data is required for evaluation")
   }
   
   # Get predictants from the object
-  Predictant <- object$YName
+  predictant <- object$YName
   
   # Check for extra parameters that are not needed for SCA
   args <- list(...)
@@ -270,20 +270,20 @@ evaluate.sca <- function(object, Testing_data, Training_data, digits = 3, ...) {
   }
   
   # Get predictions using sca_tree_predict
-  predictions_testing <- sca_tree_predict(model = object, Testing_data = Testing_data)
-  predictions_training <- sca_tree_predict(model = object, Testing_data = Training_data)
+  predictions_testing <- sca_tree_predict(model = object, testing_data = testing_data)
+  predictions_training <- sca_tree_predict(model = object, testing_data = training_data)
   
   Testing_GOF <- sca_model_evaluation(
-    Testing_data = Testing_data,
-    Simulations = predictions_testing,
-    Predictant = Predictant,
+    testing_data = testing_data,
+    simulations = predictions_testing,
+    predictant = predictant,
     digits = digits
   )
   
   Training_GOF <- sca_model_evaluation(
-    Testing_data = Training_data,
-    Simulations = predictions_training,
-    Predictant = Predictant,
+    testing_data = training_data,
+    simulations = predictions_training,
+    predictant = predictant,
     digits = digits
   )
 

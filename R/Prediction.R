@@ -124,7 +124,7 @@ f_main_p <- function(data) {
 # ---------------------------------------------------------------
 # Interface function
 # ---------------------------------------------------------------
-inference <- function(x, Weak_L) {
+inference <- function(x, weak_l) {
   # Initialize data structure
   data <- list()
   
@@ -134,11 +134,11 @@ inference <- function(x, Weak_L) {
   data$n_sample_x_cols <- ncol(data$o_sample_data_x)
   
   # Store model data
-  data$o_result_tree <- Weak_L$Tree
+  data$o_result_tree <- weak_l$Tree
   data$n_result_tree_rows <- nrow(data$o_result_tree)
-  data$o_mean_y <- Weak_L$Map
+  data$o_mean_y <- weak_l$Map
   data$n_y_cols <- ncol(data$o_mean_y)
-  data$n_model_type <- Weak_L$type
+  data$n_model_type <- weak_l$type
   
   # Initialize prediction matrix
   data$o_predictants <- matrix(NA, data$n_sample_size, data$n_y_cols)

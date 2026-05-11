@@ -5,27 +5,27 @@
 # Author: 		Kailong Li
 # Email:		lkl98509509@gmail.com
 # ===============================================================
-model_simulation <- function(model, Testing_data)
+model_simulation <- function(model, testing_data)
 {
   # Input validation
   if (is.null(model)) {
     stop("model must be an SCE object or list")
   }
   
-  if (is.null(Testing_data)) {
-    stop("Testing_data must be a data frame or matrix")
+  if (is.null(testing_data)) {
+    stop("testing_data must be a data frame or matrix")
   }
   
   if (!inherits(model, "sce") && !is.list(model)) {
     stop("model must be an SCE object or list")
   }
   
-  if (!is.data.frame(Testing_data) && !is.matrix(Testing_data)) {
-    stop("Testing_data must be a data frame or matrix")
+  if (!is.data.frame(testing_data) && !is.matrix(testing_data)) {
+    stop("testing_data must be a data frame or matrix")
   }
   
-  if (nrow(Testing_data) == 0) {
-    stop("Testing_data is empty")
+  if (nrow(testing_data) == 0) {
+    stop("testing_data is empty")
   }
   
   # Handle S3 class objects
@@ -49,7 +49,7 @@ model_simulation <- function(model, Testing_data)
   # Get testing simulations
   testing_sim <- sce_prediction(
     model = model_list,
-    X_sample = Testing_data
+    x_sample = testing_data
   )
   testing_sim <- as.data.frame(testing_sim)
   
@@ -63,26 +63,26 @@ model_simulation <- function(model, Testing_data)
   return(output)
 }
 
-sce_prediction <- function(model, X_sample)
+sce_prediction <- function(model, x_sample)
 {
   # Input validation
-  if (is.null(X_sample)) {
-    stop("X_sample must be a data frame or matrix")
+  if (is.null(x_sample)) {
+    stop("x_sample must be a data frame or matrix")
   }
   
-  if (!is.data.frame(X_sample) && !is.matrix(X_sample)) {
-    stop("X_sample must be a data frame or matrix")
+  if (!is.data.frame(x_sample) && !is.matrix(x_sample)) {
+    stop("x_sample must be a data frame or matrix")
   }
   
-  if (nrow(X_sample) == 0) {
-    stop("X_sample is empty")
+  if (nrow(x_sample) == 0) {
+    stop("x_sample is empty")
   }
   
   # Get model predictions for each tree
   predictions <- lapply(model, function(m) {
     sca_tree_predict(
       model = m,
-      Testing_data = X_sample
+      testing_data = x_sample
     )
   })
   
@@ -101,7 +101,7 @@ sce_prediction <- function(model, X_sample)
   predictant_names <- model[[1]]$YName
   
   # Calculate ensemble predictions
-  ensemble_predictions <- matrix(0, nrow = nrow(X_sample), ncol = num_predictants)
+  ensemble_predictions <- matrix(0, nrow = nrow(x_sample), ncol = num_predictants)
   
   for(i in 1:num_predictants) {
     # Extract predictions for current predictant from all trees
@@ -126,7 +126,7 @@ training_prediction <- function(model)
   predictions <- lapply(model, function(m) {
     sca_tree_predict(
       model = m,
-      Testing_data = m$Training_data
+      testing_data = m$Training_data
     )
   })
 

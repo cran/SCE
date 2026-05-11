@@ -9,13 +9,13 @@
   Evaluate model performance for SCE or SCA models.
 }
 \usage{
-\method{evaluate}{sce}(object, Testing_data, Training_data, digits = 3, ...)
-\method{evaluate}{sca}(object, Testing_data, Training_data, digits = 3, ...)
+\method{evaluate}{sce}(object, testing_data, training_data, digits = 3, ...)
+\method{evaluate}{sca}(object, testing_data, training_data, digits = 3, ...)
 }
 \arguments{
   \item{object}{An SCE or SCA model object}
-  \item{Testing_data}{Testing dataset}
-  \item{Training_data}{Training dataset}
+  \item{testing_data}{Testing dataset}
+  \item{training_data}{Training dataset}
   \item{digits}{Number of decimal places (default: 3)}
   \item{...}{Additional arguments}
 }

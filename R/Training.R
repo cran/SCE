@@ -15,11 +15,11 @@
 #: calculate wilks statistic value
 #: input: top matrix & bot matrix
 #: output: wilks value
-f_wilks_statistic <- function(o_top_matrix, o_bot_matrix, Nmin)
+f_wilks_statistic <- function(o_top_matrix, o_bot_matrix, nmin)
 {
   n_top = nrow(o_top_matrix)
   n_bot = nrow(o_bot_matrix)
-  if ((n_top + n_bot) <= (ncol(o_top_matrix) + Nmin))
+  if ((n_top + n_bot) <= (ncol(o_top_matrix) + nmin))
   {
     return(0)
   }
@@ -58,7 +58,7 @@ f_wilks_statistic <- function(o_top_matrix, o_bot_matrix, Nmin)
 }
 
 #: Helper function for iterative refinement
-find_best_split_iterative <- function(sorted_y, sorted_x, Nmin, resolution) {
+find_best_split_iterative <- function(sorted_y, sorted_x, nmin, resolution) {
   n <- nrow(sorted_y)
   p <- ncol(sorted_y)
   
@@ -76,7 +76,7 @@ find_best_split_iterative <- function(sorted_y, sorted_x, Nmin, resolution) {
   no_improvement_count <- 0
   previous_mean_wilks <- 1
   
-  while (length(current_indices) > resolution & length(current_indices) > Nmin) {
+  while (length(current_indices) > resolution & length(current_indices) > nmin) {
     iteration <- iteration + 1
     
     # cat(sprintf("Iteration %d: Current number of indices: %d\n", iteration, length(current_indices)))
@@ -92,7 +92,7 @@ find_best_split_iterative <- function(sorted_y, sorted_x, Nmin, resolution) {
       f_wilks_statistic(
         o_top_matrix = sorted_y[1:i, , drop = FALSE],
         o_bot_matrix = sorted_y[(i+1):n, , drop = FALSE],
-        Nmin = Nmin
+        nmin = nmin
       )
     })
     
@@ -203,7 +203,7 @@ find_best_split_iterative <- function(sorted_y, sorted_x, Nmin, resolution) {
     f_wilks_statistic(
       o_top_matrix = sorted_y[1:i, , drop = FALSE],
       o_bot_matrix = sorted_y[(i+1):n, , drop = FALSE],
-      Nmin = Nmin
+      nmin = nmin
     )
   })
   
@@ -226,7 +226,7 @@ find_best_split_iterative <- function(sorted_y, sorted_x, Nmin, resolution) {
   return(list(wilks = best_wilks, split = best_split))
 }
 
-find_best_split <- function(sorted_y, sorted_x, start, end, Nmin) {
+find_best_split <- function(sorted_y, sorted_x, start, end, nmin) {
   n <- nrow(sorted_y)
   
   # Calculate all Wilks' values first
@@ -235,7 +235,7 @@ find_best_split <- function(sorted_y, sorted_x, start, end, Nmin) {
     f_wilks_statistic(
       o_top_matrix = sorted_y[1:i, , drop = FALSE],
       o_bot_matrix = sorted_y[(i+1):n, , drop = FALSE],
-      Nmin = Nmin
+      nmin = nmin
     )
   })
   
@@ -261,7 +261,7 @@ find_best_split <- function(sorted_y, sorted_x, start, end, Nmin) {
 #: output: min_wilks_list(min_wilks_value=1, col_id=1, x_value=1, left_rowids=matrix(), right_rowids=matrix())
 f_min_wilks <- function(data, o_matrix_rowid, resolution)
 {
-  if (nrow(o_matrix_rowid) <= (data$n_sample_y_cols + data$Nmin))
+  if (nrow(o_matrix_rowid) <= (data$n_sample_y_cols + data$nmin))
   {
     return(list(min_wilks_value=0, col_id=0, x_value=0, left_rowids=matrix(), right_rowids=matrix()))
   }
@@ -281,12 +281,12 @@ f_min_wilks <- function(data, o_matrix_rowid, resolution)
     
     if (n > resolution) {
       # Use iterative refinement
-      best_result <- find_best_split_iterative(sorted_y, sorted_x, data$Nmin, resolution)
+      best_result <- find_best_split_iterative(sorted_y, sorted_x, data$nmin, resolution)
       best_wilks <- best_result$wilks
       best_split <- best_result$split
     } else {
       # Full search for small datasets
-      result <- find_best_split(sorted_y, sorted_x, 1, n-1, data$Nmin)
+      result <- find_best_split(sorted_y, sorted_x, 1, n-1, data$nmin)
       best_wilks <- result$wilks
       best_split <- result$split
     }
@@ -317,7 +317,7 @@ f_cal_chk_f <- function(data, min_wilks_list)
 {
   n_row_left = nrow(min_wilks_list$left_rowids)
   n_row_right = nrow(min_wilks_list$right_rowids)
-  if ((n_row_left + n_row_right) <= (data$n_sample_y_cols + data$Nmin))
+  if ((n_row_left + n_row_right) <= (data$n_sample_y_cols + data$nmin))
   {
     return(0)
   }
@@ -378,7 +378,7 @@ f_checkif_leaf <- function(data, n_nodeid)
     return(list(data = data, is_leaf = 1))
   }
 
-  if (nrow(data$o_output_tree[[n_nodeid]]$rowids_matrix) <= (data$n_sample_y_cols + data$Nmin))
+  if (nrow(data$o_output_tree[[n_nodeid]]$rowids_matrix) <= (data$n_sample_y_cols + data$nmin))
   {
     data$o_output_tree[[n_nodeid]]$left <- -1
     data$o_output_tree[[n_nodeid]]$right <- -1
@@ -397,7 +397,7 @@ f_checkif_leaf <- function(data, n_nodeid)
 }
 
 #: process node
-f_processnode <- function(data, node_id, Max_merge_iter, resolution, verbose = FALSE)
+f_processnode <- function(data, node_id, max_merge_iter, resolution, verbose = FALSE)
 {
   #: if a leaf, just exit this function
   leaf_check <- f_checkif_leaf(data, node_id)
@@ -454,7 +454,7 @@ f_processnode <- function(data, node_id, Max_merge_iter, resolution, verbose = F
                   n_nodeid_cut_temp, min_wilks_list$min_wilks_value, n_cut_flag))
       }
       
-      if ((n_cut_flag == 1) && (data$Merge_iter <= Max_merge_iter))
+      if ((n_cut_flag == 1) && (data$merge_iter <= max_merge_iter))
       {
         #: if can be cut, then cut it and process it's sub nodes, respectively
         n_cursor_tree = length(data$o_output_tree) + 1
@@ -508,7 +508,7 @@ f_processnode <- function(data, node_id, Max_merge_iter, resolution, verbose = F
         #: update cut flag
         data$n_flag_cut <- 1
       }
-      else if ((n_cut_flag == 0) && (data$Merge_iter <= Max_merge_iter))
+      else if ((n_cut_flag == 0) && (data$merge_iter <= max_merge_iter))
       {
         #: is a leaf, set it as a leaf and add into merge stack
         data$o_output_tree[[n_nodeid_cut_temp]]$left <- -1
@@ -565,8 +565,8 @@ f_processnode <- function(data, node_id, Max_merge_iter, resolution, verbose = F
 
             #: if the total number of each sample (a, b) is lower than (rSCA.env$n_sample_y_cols + Nmin)
             #: then the wilks value is 0, but now they can not be merged!!!
-            if (nrow(data$o_output_tree[[n_nodeid_merge_a]]$rowids_matrix) <= (data$n_sample_y_cols + data$Nmin) || 
-                nrow(data$o_output_tree[[n_nodeid_merge_b]]$rowids_matrix) <= (data$n_sample_y_cols + data$Nmin))
+            if (nrow(data$o_output_tree[[n_nodeid_merge_a]]$rowids_matrix) <= (data$n_sample_y_cols + data$nmin) || 
+                nrow(data$o_output_tree[[n_nodeid_merge_b]]$rowids_matrix) <= (data$n_sample_y_cols + data$nmin))
             {
               imerge_b = imerge_b - 1
               next
@@ -579,7 +579,7 @@ f_processnode <- function(data, node_id, Max_merge_iter, resolution, verbose = F
             o_bot_matrix_temp = matrix(0, nrow(data$o_output_tree[[n_nodeid_merge_b]]$rowids_matrix), data$n_sample_y_cols)
             o_bot_matrix_temp[1:nrow(o_bot_matrix_temp), ] = data.matrix(data$o_sample_data_y[c(data$o_output_tree[[n_nodeid_merge_b]]$rowids_matrix), ])
 
-            n_wilks_value = f_wilks_statistic(o_top_matrix_temp, o_bot_matrix_temp, data$Nmin)
+            n_wilks_value = f_wilks_statistic(o_top_matrix_temp, o_bot_matrix_temp, data$nmin)
 
             #: 2> contruct min wilks list
             o_temp_min_wilks_list = list(min_wilks_value=n_wilks_value, col_id=0, x_value=0, 
@@ -659,7 +659,7 @@ f_processnode <- function(data, node_id, Max_merge_iter, resolution, verbose = F
 
       data$o_nodeid_stack_merge <- c()
       data$n_nodeid_statck_merge_cursor <- 1
-      data$Merge_iter = data$Merge_iter + 1
+      data$merge_iter = data$merge_iter + 1
     }
   }
   
@@ -670,7 +670,7 @@ f_processnode <- function(data, node_id, Max_merge_iter, resolution, verbose = F
 # ---------------------------------------------------------------
 # Interface function
 # ---------------------------------------------------------------
-do_cluster <- function(data, Nmin, resolution, verbose = FALSE)
+do_cluster <- function(data, nmin, resolution, verbose = FALSE)
 {
   #: store the start time
   time_stat <- proc.time()
@@ -679,7 +679,7 @@ do_cluster <- function(data, Nmin, resolution, verbose = FALSE)
   result <- f_init(data)
 
   #: do main function
-  result <- f_main(result, Max_merge_iter=10, Nmin=Nmin, resolution = resolution, verbose = verbose)
+  result <- f_main(result, max_merge_iter=10, nmin=nmin, resolution = resolution, verbose = verbose)
 
   # : calculate the total time used
   time_end <- (proc.time() - time_stat)[[3]]
@@ -749,7 +749,7 @@ f_init <- function(data)
   #: some statistical infos for the results
   data$n_cut_times <- 0
   data$n_merge_times <- 0
-  data$Merge_iter <- 0
+  data$merge_iter <- 0
   data$n_leafnodes_count <- 0
 
   return(data)
@@ -758,10 +758,10 @@ f_init <- function(data)
 # ---------------------------------------------------------------
 # Main functions
 # ---------------------------------------------------------------
-f_main <- function(data, Max_merge_iter, Nmin, resolution, verbose = FALSE)
+f_main <- function(data, max_merge_iter, nmin, resolution, verbose = FALSE)
 {
   #: cut from the root node
-  data <- f_processnode(data, 1, Max_merge_iter, resolution, verbose)
+  data <- f_processnode(data, 1, max_merge_iter, resolution, verbose)
 
   #: results matrix structure -> matrix(id, col_id, x_value, left_id, right_id, left_mat, right_mat, wilk_min)
   o_results_matrix = matrix(0, length(data$o_output_tree), 8)

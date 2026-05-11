@@ -8,16 +8,16 @@
   Builds a Stepwise Clustered Ensemble (SCE) model, which is an ensemble of SCA trees built using bootstrap samples and random feature selection, providing improved prediction accuracy and robustness.
 }
 \usage{
-sce(Training_data, X, Y, mfeature, Nmin, Ntree, alpha = 0.05,
+sce(training_data, x, y, mfeature, nmin, ntree, alpha = 0.05,
     resolution = 1000, verbose = FALSE, parallel = TRUE)
 }
 \arguments{
-  \item{Training_data}{A data.frame containing the training data}
-  \item{X}{Character vector of predictor variable names}
-  \item{Y}{Character vector of predictant variable names}
+  \item{training_data}{A data.frame containing the training data}
+  \item{x}{Character vector of predictor variable names}
+  \item{y}{Character vector of predictant variable names}
   \item{mfeature}{Number of features to randomly select for each tree}
-  \item{Nmin}{Minimum number of samples in a leaf node}
-  \item{Ntree}{Number of trees in the ensemble}
+  \item{nmin}{Minimum number of samples in a leaf node}
+  \item{ntree}{Number of trees in the ensemble}
   \item{alpha}{Significance level for clustering (default: 0.05)}
   \item{resolution}{Resolution for splitting (default: 1000)}
   \item{verbose}{Print progress information (default: FALSE)}
@@ -38,12 +38,12 @@ sce(Training_data, X, Y, mfeature, Nmin, Ntree, alpha = 0.05,
 
   # Build SCE model
   sce_model <- sce(
-    Training_data = streamflow_training_10var,
-    X = Predictors,
-    Y = Predictants,
+    training_data = streamflow_training_10var,
+    x = Predictors,
+    y = Predictants,
     mfeature = round(0.5 * length(Predictors)),
-    Nmin = 5,
-    Ntree = 48,
+    nmin = 5,
+    ntree = 48,
     alpha = 0.05,
     resolution = 1000,
     parallel = FALSE

@@ -35,7 +35,7 @@ sce_object <- function(trees, predictors, predictants, parameters, call) {
   )
 }
 
-sce <- function(Training_data, X, Y, mfeature, Nmin, Ntree, alpha = 0.05, resolution = 1000, verbose = FALSE, parallel = TRUE) {
+sce <- function(training_data, x, y, mfeature, nmin, ntree, alpha = 0.05, resolution = 1000, verbose = FALSE, parallel = TRUE) {
   # Store the function call
   call <- match.call()
   
@@ -44,90 +44,90 @@ sce <- function(Training_data, X, Y, mfeature, Nmin, Ntree, alpha = 0.05, resolu
     stop("alpha must be a number between 0 and 1")
   }
   
-  if (!is.numeric(Nmin) || Nmin <= 0) {
-    stop("Nmin must be a positive number")
+  if (!is.numeric(nmin) || nmin <= 0) {
+    stop("nmin must be a positive number")
   }
   
-  if (!is.numeric(Ntree) || Ntree <= 0) {
-    stop("Ntree must be a positive number")
+  if (!is.numeric(ntree) || ntree <= 0) {
+    stop("ntree must be a positive number")
   }
   
-  if (!is.numeric(mfeature) || mfeature <= 0 || mfeature > length(X)) {
-    stop(sprintf("mfeature must be between 1 and number of predictors (%d)", length(X)))
+  if (!is.numeric(mfeature) || mfeature <= 0 || mfeature > length(x)) {
+    stop(sprintf("mfeature must be between 1 and number of predictors (%d)", length(x)))
   }
   
   if (!is.numeric(resolution) || resolution <= 0) {
     stop("resolution must be a positive number")
   }
   
-  if (!is.data.frame(Training_data) && !is.matrix(Training_data)) {
-    stop("Training_data must be a data frame or matrix")
+  if (!is.data.frame(training_data) && !is.matrix(training_data)) {
+    stop("training_data must be a data frame or matrix")
   }
   
-  if (nrow(Training_data) == 0) {
-    stop("Training_data is empty")
+  if (nrow(training_data) == 0) {
+    stop("training_data is empty")
   }
   
-  if (!all(X %in% colnames(Training_data))) {
-    missing_vars <- setdiff(X, colnames(Training_data))
-    stop(sprintf("The following predictors are not found in Training_data: %s", 
+  if (!all(x %in% colnames(training_data))) {
+    missing_vars <- setdiff(x, colnames(training_data))
+    stop(sprintf("The following predictors are not found in training_data: %s", 
                 paste(missing_vars, collapse = ", ")))
   }
   
-  if (!all(Y %in% colnames(Training_data))) {
-    missing_vars <- setdiff(Y, colnames(Training_data))
-    stop(sprintf("The following predictants are not found in Training_data: %s", 
+  if (!all(y %in% colnames(training_data))) {
+    missing_vars <- setdiff(y, colnames(training_data))
+    stop(sprintf("The following predictants are not found in training_data: %s", 
                 paste(missing_vars, collapse = ", ")))
   }
   
   # Check for missing values
-  if (any(is.na(Training_data[, X])) || any(is.na(Training_data[, Y]))) {
-    stop("Training_data contains missing values")
+  if (any(is.na(training_data[, x])) || any(is.na(training_data[, y]))) {
+    stop("training_data contains missing values")
   }
   
   # Check data types
-  if (!all(sapply(Training_data[, X], is.numeric))) {
-    non_numeric <- names(which(!sapply(Training_data[, X], is.numeric)))
+  if (!all(sapply(training_data[, x], is.numeric))) {
+    non_numeric <- names(which(!sapply(training_data[, x], is.numeric)))
     stop(sprintf("The following predictors are not numeric: %s", 
                 paste(non_numeric, collapse = ", ")))
   }
   
-  if (!all(sapply(Training_data[, Y], is.numeric))) {
-    non_numeric <- names(which(!sapply(Training_data[, Y], is.numeric)))
+  if (!all(sapply(training_data[, y], is.numeric))) {
+    non_numeric <- names(which(!sapply(training_data[, y], is.numeric)))
     stop(sprintf("The following predictants are not numeric: %s", 
                 paste(non_numeric, collapse = ", ")))
   }
 
   # Prepare data (following original structure)
-  o_xdata <- as.data.frame(Training_data[, X, drop = FALSE])
-  o_ydata <- as.data.frame(Training_data[, Y, drop = FALSE])
+  o_xdata <- as.data.frame(training_data[, x, drop = FALSE])
+  o_ydata <- as.data.frame(training_data[, y, drop = FALSE])
   
   # Check if we have enough data
-  if (nrow(o_xdata) < Nmin) {
-    stop(sprintf("Sample size (%d) is less than Nmin (%d)", 
-                nrow(o_xdata), Nmin))
+  if (nrow(o_xdata) < nmin) {
+    stop(sprintf("Sample size (%d) is less than nmin (%d)", 
+                nrow(o_xdata), nmin))
   }
 
-  colnames(o_xdata) <- X
-  colnames(o_ydata) <- Y
+  colnames(o_xdata) <- x
+  colnames(o_ydata) <- y
 
   # Setup bootstrap and random features (following original approach)
   n_predictors <- ncol(o_xdata)
   n_samples <- nrow(o_xdata)
   
   # Generate random features for all trees at once
-  Random_col_matrix <- replicate(Ntree, sort(sample(seq_len(n_predictors), mfeature)))
+  Random_col_matrix <- replicate(ntree, sort(sample(seq_len(n_predictors), mfeature)))
   Random_col <- split(Random_col_matrix, col(Random_col_matrix))
   
   # Generate bootstrap samples for all trees at once
-  tree_list <- replicate(Ntree, sample(seq_len(n_samples), replace = TRUE), simplify = FALSE)
+  tree_list <- replicate(ntree, sample(seq_len(n_samples), replace = TRUE), simplify = FALSE)
   
   # Create bootstrap list
-  Bootst_rep <- Map(function(x, y) list(
-    Tree = paste("SCA", x, sep = "_"),
-    mfeature = Random_col[[x]],
-    sample = tree_list[[x]]
-  ), x = seq_len(Ntree))
+  Bootst_rep <- Map(function(idx) list(
+    Tree = paste("SCA", idx, sep = "_"),
+    mfeature = Random_col[[idx]],
+    sample = tree_list[[idx]]
+  ), idx = seq_len(ntree))
   
   # Build a single per-tree worker so the parallel and sequential
   # branches share the same logic (and so the parallel branch can
@@ -142,7 +142,7 @@ sce <- function(Training_data, X, Y, mfeature, Nmin, Ntree, alpha = 0.05, resolu
       o_xdata[rep$sample, rep$mfeature, drop = FALSE],
       o_ydata[rep$sample, , drop = FALSE]
     )
-    colnames(tree_data) <- c(feature_names, Y)
+    colnames(tree_data) <- c(feature_names, y)
 
     # Store the tree data
     tree_info <- list(
@@ -152,10 +152,10 @@ sce <- function(Training_data, X, Y, mfeature, Nmin, Ntree, alpha = 0.05, resolu
     )
 
     # Run SCA
-    tree_model <- sca(alpha = alpha, Nmin = Nmin, resolution = resolution,
-                     Training_data = tree_data,
-                     X = feature_names,
-                     Y = Y,
+    tree_model <- sca(alpha = alpha, nmin = nmin, resolution = resolution,
+                     training_data = tree_data,
+                     x = feature_names,
+                     y = y,
                      verbose = verbose)
 
     # Calculate OOB error
@@ -176,7 +176,7 @@ sce <- function(Training_data, X, Y, mfeature, Nmin, Ntree, alpha = 0.05, resolu
     # Make predictions on OOB data
     oob_predictions <- sca_tree_predict(
       model = tree_model,
-      Testing_data = oob_xdata
+      testing_data = oob_xdata
     )
 
     # Calculate R-squared for OOB predictions
@@ -212,7 +212,7 @@ sce <- function(Training_data, X, Y, mfeature, Nmin, Ntree, alpha = 0.05, resolu
     if (is.na(available_cores) || available_cores < 2) {
       use_parallel <- FALSE
     } else {
-      max_cores <- min(available_cores, Ntree)
+      max_cores <- min(available_cores, ntree)
       if (max_cores < 2) use_parallel <- FALSE
     }
   }
@@ -223,7 +223,7 @@ sce <- function(Training_data, X, Y, mfeature, Nmin, Ntree, alpha = 0.05, resolu
 
     # Export required functions and objects to workers
     parallel::clusterExport(Clus,
-      c("o_xdata", "o_ydata", "Y", "Nmin", "alpha", "resolution", "verbose",
+      c("o_xdata", "o_ydata", "y", "nmin", "alpha", "resolution", "verbose",
         "n_samples", "process_tree",
         "find_best_split_iterative", "find_best_split",
         "sca", "sca_object", "f_processnode", "f_min_wilks", "f_wilks_statistic",
@@ -297,25 +297,25 @@ sce <- function(Training_data, X, Y, mfeature, Nmin, Ntree, alpha = 0.05, resolu
     weight_OOB <- rep(1/length(OOB_RSQ), length(OOB_RSQ))
   }
   
-  sce_res <- Map(function(x, w) c(x, list(weight = w)), x = sce_res, w = weight_OOB)
+  sce_res <- Map(function(tree, w) c(tree, list(weight = w)), tree = sce_res, w = weight_OOB)
   
   # Create parameters list
   parameters <- list(
-    n_trees = Ntree,
+    n_trees = ntree,
     mfeature = mfeature,
-    Nmin = Nmin,
+    nmin = nmin,
     alpha = alpha,
     resolution = resolution,
     n_samples = n_samples,
-    n_predictors = length(X),
-    n_predictants = length(Y)
+    n_predictors = length(x),
+    n_predictants = length(y)
   )
   
   # Return S3 class object
   return(sce_object(
     trees = sce_res,
-    predictors = X,
-    predictants = Y,
+    predictors = x,
+    predictants = y,
     parameters = parameters,
     call = call
   ))
@@ -347,7 +347,7 @@ print.sce <- function(x, ...) {
   cat("Model Parameters:\n")
   cat("  Number of trees:", x$parameters$n_trees, "\n")
   cat("  Features per tree:", x$parameters$mfeature, "\n")
-  cat("  Minimum samples per node:", x$parameters$Nmin, "\n")
+  cat("  Minimum samples per node:", x$parameters$nmin, "\n")
   cat("  Alpha (significance level):", x$parameters$alpha, "\n")
   cat("  Resolution:", x$parameters$resolution, "\n")
   cat("  Training samples:", x$parameters$n_samples, "\n")
@@ -428,27 +428,27 @@ predict.sce <- function(object, newdata, ...) {
   }
   
   # Call model_simulation which returns Training, Validation, and Testing predictions
-  return(model_simulation(model = object, Testing_data = newdata))
+  return(model_simulation(model = object, testing_data = newdata))
 }
 
 # Importance method for SCE objects
-importance.sce <- function(object, OOB_weight = TRUE, digits = 2, ...) {
+importance.sce <- function(object, oob_weight = TRUE, digits = 2, ...) {
   # This is a wrapper for wilks_importance
-  return(wilks_importance(model = object, OOB_weight = OOB_weight, digits = digits))
+  return(wilks_importance(model = object, oob_weight = oob_weight, digits = digits))
 }
 
 # Evaluate method for SCE objects
-evaluate.sce <- function(object, Testing_data, Training_data, digits = 3, ...) {
+evaluate.sce <- function(object, testing_data, training_data, digits = 3, ...) {
   # This is a wrapper for sce_model_evaluation
-  if (missing(Testing_data)) {
-    stop("Testing_data is required for evaluation")
+  if (missing(testing_data)) {
+    stop("testing_data is required for evaluation")
   }
-  if (missing(Training_data)) {
-    stop("Training_data is required for evaluation")
+  if (missing(training_data)) {
+    stop("training_data is required for evaluation")
   }
   
   # Get predictants from the object
-  Predictant <- object$predictants
+  predictant <- object$predictants
   
   # Check for any extra parameters that might be passed
   args <- list(...)
@@ -458,15 +458,14 @@ evaluate.sce <- function(object, Testing_data, Training_data, digits = 3, ...) {
   }
   
   # Get simulations using model_simulation
-  Simulations <- model_simulation(model = object, Testing_data = Testing_data)
+  simulations <- model_simulation(model = object, testing_data = testing_data)
   
   # Call sce_model_evaluation with validation simulations
   return(sce_model_evaluation(
-    Testing_data = Testing_data,
-    Training_data = Training_data,
-    Simulations = Simulations,
-    Predictant = Predictant,
+    testing_data = testing_data,
+    training_data = training_data,
+    simulations = simulations,
+    predictant = predictant,
     digits = digits
   ))
 }
-

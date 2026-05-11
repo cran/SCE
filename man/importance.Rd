@@ -9,12 +9,12 @@
   Calculate variable importance for SCE or SCA models.
 }
 \usage{
-\method{importance}{sce}(object, OOB_weight = TRUE, digits = 2, ...)
+\method{importance}{sce}(object, oob_weight = TRUE, digits = 2, ...)
 \method{importance}{sca}(object, digits = 2, ...)
 }
 \arguments{
   \item{object}{An SCE or SCA model object}
-  \item{OOB_weight}{Use out-of-bag weights for importance calculation (SCE only, default: TRUE)}
+  \item{oob_weight}{Use out-of-bag weights for importance calculation (SCE only, default: TRUE)}
   \item{digits}{Number of decimal places to round the returned relative importance values (default: 2)}
   \item{...}{Additional arguments}
 }

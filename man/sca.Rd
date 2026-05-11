@@ -8,13 +8,13 @@
   Builds a single Stepwise Cluster Analysis (SCA) tree model that recursively partitions the data space based on Wilks' Lambda statistic.
 }
 \usage{
-sca(Training_data, X, Y, Nmin, alpha = 0.05, resolution = 1000, verbose = FALSE)
+sca(training_data, x, y, nmin, alpha = 0.05, resolution = 1000, verbose = FALSE)
 }
 \arguments{
-  \item{Training_data}{A data.frame containing the training data}
-  \item{X}{Character vector of predictor variable names}
-  \item{Y}{Character vector of predictant variable names}
-  \item{Nmin}{Minimum number of samples in a leaf node}
+  \item{training_data}{A data.frame containing the training data}
+  \item{x}{Character vector of predictor variable names}
+  \item{y}{Character vector of predictant variable names}
+  \item{nmin}{Minimum number of samples in a leaf node}
   \item{alpha}{Significance level for clustering (default: 0.05)}
   \item{resolution}{Resolution for splitting (default: 1000)}
   \item{verbose}{Print progress information (default: FALSE)}
@@ -34,10 +34,10 @@ sca(Training_data, X, Y, Nmin, alpha = 0.05, resolution = 1000, verbose = FALSE)
 
   # Build SCA model
   sca_model <- sca(
-    Training_data = streamflow_training_10var,
-    X = Predictors,
-    Y = Predictants,
-    Nmin = 5,
+    training_data = streamflow_training_10var,
+    x = Predictors,
+    y = Predictants,
+    nmin = 5,
     alpha = 0.05,
     resolution = 1000
   )
